@@ -1,81 +1,140 @@
 #!/bin/bash
 ## to be updated to match your settings
-PROJECT_HOME="."
-credentials_file="$PROJECT_HOME/data/credentials.txt"
+# PROJECT_HOME="linux"
+LOCAL_DATA_STORAGE="data"
+credentials_file="$LOCAL_DATA_STORAGE/credentials.txt"
 
-# Function to prompt for credentials
-get_credentials() {
-    read -p 'Username: ' user
-    read -rs -p 'Password: ' pass
-    echo
+creata_data_folder(){
+    if [ ! -d "$LOCAL_DATA_STORAGE" ]; then
+        mkdir "$LOCAL_DATA_STORAGE"
+    fi
+
+    if [ ! -f "$credentials_file" ]; then
+        touch "$credentials_file"
+    fi
 }
 
+#generate salt
 generate_salt() {
-    openssl rand -hex 8
-    return 0
+   salt=$(openssl rand -hex 8)
+   echo "$salt"
 }
 
 ## function for hashing
 hash_password() {
-    # arg1 is the password
-    # arg2 is the salt
-    password=$1
-    salt=$2
-    # we are using the sha256 hash for this.
-    echo -n "${password}${salt}" | sha256sum | awk '{print $1}'
-    return 0
+    local password="$1"
+    local salt="$2"
+    hash_password=$(echo -n "$password$salt" | sha256sum | awk '{print $1}' )
+    echo "$hash_password"
 }
 
 check_existing_username(){
-    username=$1
-    ## verify if a username is already included in the credentials file
+    local email="$1"
+    if grep -q "|$email|" "$credentials_file"; then
+        return 0
+    else
+        return 1
+    fi
+
+}
+
+
+##check email validity
+is_valid_email(){
+    local email="$1"
+    if [[ "$email" =~ ^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$ ]]; then
+        return 0
+    else
+        return 1
+    fi
 }
 
 ## function to add new credentials to the file
 register_credentials() {
-    # arg1 is the username
-    # arg2 is the password
-    # arg3 is the fullname of the user
-    # arg4 (optional) is the role. Defaults to "normal"
+    creata_data_folder
 
-    username=$1
-    password=$2
-    fullname=$3
-    ## call the function to check if the username exists
-    check_existing_username $username
-    #TODO: if it exists, safely fails from the function.
+    echo "===== User Registration ====="
+
+    read -p 'Enter your username: ' username
+    read -p "Enter your email: " email
+
+    if ! is_valid_email "$email" || check_existing_username "$email"; then
+        echo -e "\nInvalid email or user with username '$username' or email '$email' already exists. Regisration failed."
+
+    else
+       stty -echo
+       read -p "Enter your password: " password
+       stty -echo
     
-    ## retrieve the role. Defaults to "normal" if the 4th argument is not passed
+    salt=$(generate_salt)
 
-    ## check if the role is valid. Should be either normal, salesperson, or admin
+    hash_password=$(hash_password "$password" "$salt")
 
-    ## first generate a salt
-    salt=`generate_salt`
-    ## then hash the password with the salt
-    hashed_pwd=`hash_password $password $salt`
-    ## append the line in the specified format to the credentials file (see below)
-    ## username:hash:salt:fullname:role:is_logged_in
+    echo -e "\nSelect your role: "
+    echo "1. admin"
+    echo "2. salesperson"
+    echo "3. normal"
+
+    read -p "Enter the role number: " role_number
+
+    case $role_number in
+        1)
+            role="admin"
+            ;;
+        2)
+            role="salesperson"
+            ;;
+        3)
+            role="normal"
+            ;;
+        *)
+        echo "Invalid role. Assuming 'normal' role."
+        role="normal"
+        ;;
+    
+    esac
+
+    echo "$username|$email|$hash_password|$role|$salt" >> "$credentials_file"
+    echo -e "\nRegistration successful"
+
+    fi
+}
+
+#Verify username already exists
+check_username(){
+    local username="$1"
+    if grep -q "|$username|" "$credentials_file"; then
+        return 0
+    else
+        return 1
+    fi
 }
 
 # Function to verify credentials
 verify_credentials() {
-    ## arg1 is username
-    ## arg2 is password
-    username=$1
-    password=$2
-    ## retrieve the stored hash, and the salt from the credentials file
-    # if there is no line, then return 1 and output "Invalid username"
+    local username="$1"
+    local password="$2"
+}
 
-    ## compute the hash based on the provided password
-    
-    ## compare to the stored hash
-    ### if the hashes match, update the credentials file, override the .logged_in file with the
-    ### username of the logged in user
+# Function to prompt for credentials
+get_credentials() {
+    creata_data_folder
 
-    ### else, print "invalid password" and fail.
+    read -p "Enter your username: " username
+    stty -echo
+    read -p "Enter your password: " password
+    stty echo
+    echo 
+
+    if verify_credentials "$username" "$password"; then
+        echo -e "\nLogin successful. Welcome, $username!"
+    else
+        echo -e "\nLogin failed. Invalid credentials."
+    fi
 }
 
 logout() {
+    echo "Log out..."
     #TODO: check that the .logged_in file is not empty
     # if the file exists and is not empty, read its content to retrieve the username
     # of the currently logged in user
@@ -92,7 +151,35 @@ logout() {
 # provided functions.
 
 # Main script execution starts here
-echo "Welcome to the authentication system."
+while true; do
+    echo -e "Welcome to the authentication system."
+    echo "\nselect an option"
+    echo "1. Login"
+    echo "2. Register"
+    echo "3. Logout"
+    echo "4. close the program"
+
+    read -p "Enter your choice: " choice
+
+    case $choice in
+        1)
+            get_credentials
+            ;;
+        2)
+            register_credentials
+            ;;
+        3)
+            echo "Exiting..."
+            break
+            ;;
+        *)
+            echo "Invalid choice. Try again"
+            ;;
+    esac
+
+
+done
+
 
 #### BONUS
 #1. Implement a function to delete an account from the file
