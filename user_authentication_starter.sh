@@ -16,21 +16,20 @@ creata_data_folder(){
 
 #generate salt
 generate_salt() {
-   salt=$(openssl rand -hex 8)
-   echo "$salt"
+   openssl rand -hex 8
+   return 0
 }
 
 ## function for hashing
 hash_password() {
-    local password="$1"
-    local salt="$2"
-    hash_password=$(echo -n "$password$salt" | sha256sum | awk '{print $1}' )
-    echo "$hash_password"
+    password=$1
+    salt=$2
+    echo -n "${password}${salt}" | sha256sum | awk '{print $1}'
 }
 
 check_existing_username(){
     local email="$1"
-    if grep -q "|$email|" "$credentials_file"; then
+    if grep -q ":$email:" "$credentials_file"; then
         return 0
     else
         return 1
@@ -94,7 +93,7 @@ register_credentials() {
     
     esac
 
-    echo "$username|$email|$hash_password|$role|$salt" >> "$credentials_file"
+    echo "$username:$email:$hash_password:$role:$salt" >> "$credentials_file"
     echo -e "\nRegistration successful"
 
     fi
@@ -103,7 +102,7 @@ register_credentials() {
 #Verify username already exists
 check_username(){
     local username="$1"
-    if grep -q "|$username|" "$credentials_file"; then
+    if [ -f "$credentials_file" ] && grep -q "^$username:" "$credentials_file"; then
         return 0
     else
         return 1
@@ -114,6 +113,22 @@ check_username(){
 verify_credentials() {
     local username="$1"
     local password="$2"
+
+    if check_username "$username"; then
+        stored_credentials=$(grep "^$username:" "$credentials_file")
+        stored_password=$(echo "$stored_credentials" | cut -d ":" -f 3)
+        stored_salt=$(echo "$stored_credentials" | cut -d ":" -f 5)
+
+        hashed_password_input=$(hash_password "$password" "$stored_salt")
+
+        if [ "$hashed_password_input" = "$stored_password" ]; then
+            return 0 # Credentials are valid
+        else
+            return 1 # Invalid credentials
+        fi
+    else
+        return 1 # Invalid credentials
+    fi
 }
 
 # Function to prompt for credentials
@@ -124,22 +139,21 @@ get_credentials() {
     stty -echo
     read -p "Enter your password: " password
     stty echo
-    echo 
+    echo
 
     if verify_credentials "$username" "$password"; then
         echo -e "\nLogin successful. Welcome, $username!"
+        echo "$username" > .logged_in
     else
         echo -e "\nLogin failed. Invalid credentials."
+        rm -f .logged_in
     fi
 }
 
+
 logout() {
     echo "Log out..."
-    #TODO: check that the .logged_in file is not empty
-    # if the file exists and is not empty, read its content to retrieve the username
-    # of the currently logged in user
-
-    # then delete the existing .logged_in file and update the credentials file by changing the last field to 0
+   rm -f .logged_in
 }
 
 ## Create the menu for the application
