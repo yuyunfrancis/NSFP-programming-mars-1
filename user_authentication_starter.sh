@@ -150,6 +150,19 @@ get_credentials() {
     fi
 }
 
+# Function to delete an account from the file
+delete_user() {
+    creata_data_folder
+
+    read -p "Enter the username of the user to delete: " username
+    if check_username "$username"; then
+        sed -i "/^$username:/d" $credentials_file
+        echo -e "\nThe user $username has been deleted successfully.\n"
+    else
+        echo -e "\nOperation failed. User doesn't exist.\n"
+    fi
+}
+
 
 logout() {
     echo "Log out..."
@@ -167,11 +180,12 @@ logout() {
 # Main script execution starts here
 while true; do
     echo -e "Welcome to the authentication system."
-    echo "\nselect an option"
+    echo "Select an option"
     echo "1. Login"
     echo "2. Register"
     echo "3. Logout"
-    echo "4. close the program"
+    echo "4. Delete user"
+    echo "5. close the program"
 
     read -p "Enter your choice: " choice
 
@@ -185,6 +199,9 @@ while true; do
         3)
             echo "Exiting..."
             break
+            ;;
+        4)
+            delete_user
             ;;
         *)
             echo "Invalid choice. Try again"
