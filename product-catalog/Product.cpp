@@ -26,34 +26,42 @@ class Product{
 
     string getName(){
         //TODO Add code that return the Product Name
+        return name;
     }
 
     string getBrand(){
         //TODO Add code that return the Product Brand
+        return brand;
     }
 
     string getDecrisption(){
         //TODO Add code that return the Product Description
+        return description;
     }
 
     string getDosageInstraction(){
         //TODO Add code that return the Product Dosage Instruction
+        return dosageInstruction;
     }
 
     string getCategory(){
         //TODO Add code that return the Product Category
+        return category;
     }
     
     int getQuantity(){
         //TODO Add code that return the Product Quantity
+        return quantity;
     }
 
     float getPrice(){
         //TODO Add code that return the Product Price
+        return price;
     }
 
     bool getRequiresPrescription(){
         //TODO Add code that return Product Requires Prescription status
+        return requires_prescription;
     }
 
 
@@ -83,12 +91,21 @@ class Product{
         // TODO Add code to prompt user for input for any Product string field
         // method takes text to display e.g: "Enter Product Name:"
         // it prompts a user and return user input in form of text. Text can be made by multiple words.
+        string name;
+        cout << promptText;
+        getline(cin, name);
+        return name;
     }
 
     float promptNumberField(string promptText){
         // TODO Add code to prompt user for input for any Product Numeric field
         // method takes text to display e.g: "Enter Product Name:"
         // it prompts a user and return user input in form of text. Text can be made by multiple words.
+        string numeric;
+        cout << promptText;
+        getline(cin, numeric);
+        float value = stof(numeric);
+        return value;
     }
 
     bool promptRequirePrescription()
@@ -96,21 +113,41 @@ class Product{
         // TODO Add code to prompt user for choosing if Product requires prescription.
         // User can type 1 or 0. 
         // it prompts a user and return user input in form of boolean. 
+        int value;
+        cout << "Does this product require prescription (1 for yes, 0 for no): " << endl ;
+        cin >> value;
+        if (value == 1)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+
     }
 
     void createProduct()
     {
-
+        
         // TODO Add code that calls promptTextField() method and prompt user for entering product name and update the name field.
+        name = promptTextField("Enter Name for the product: ");
         // TODO Add code that calls promptTextField() method and prompt user for entering product brand and update the brand field.
+        brand = promptTextField("Enter Brand for the product: ");
         // TODO Add code that calls promptTextField() method and prompt user for entering product description and update the decription field.
+        description = promptTextField("Enter Description for the product: ");
         // TODO Add code that calls promptTextField() method and prompt user for entering product category and update the category field.
+        category = promptTextField("Enter Category for the product: ");
         // TODO Add code that calls promptTextField() method and prompt user for entering product dosageInstruction and update the dosage instruction field.
+        dosageInstruction = promptTextField("Enter Dosage Instruction for the product: ");
         // TODO Add code that calls promptNumberField() method and prompt user for entering product quantity and update the quantity field.
+        quantity = int(promptNumberField("Enter Quantity for the product: "));
         // TODO Add code that calls promptNumberField() method and prompt user for entering product price and update the price field.
+        price = promptNumberField("Enter Price for the product: ");
         // TODO Add code that calls promptRequirePrescription() method and prompt user for entering product requires presc and update the requiresprescription field.
-
+        requires_prescription = promptRequirePrescription();
         // Add code to generate Unique code for product using generateUniqueCode method
+        code = generateUniqueCode();
        
     };
 
@@ -122,6 +159,10 @@ class Product{
       // TODO Add code for converting a product to json form from the private declared attributes.
       // The Output should look like:
       //{"code":"tgtwdNbCnwx","name":"name 1","brand":"br 2","description":"df","dosage_instruction":"dfg","price":123.000000,"quantity":13,"category":"des","requires_prescription":1}
+        productInJson = "{\"code\":" + code + ",\"name\":" + name + ",\"brand\":" + brand \
+        + ",\"description\":" + description + ",\"dosage_instruction\":" + dosageInstruction \
+        + ",\"price\":" + to_string(price) + ",\"quantity\":" + to_string(quantity) \
+        + ",\"category\":" + category + ",\"requires_prescription\":" + to_string(requires_prescription) + " }";
 
         return productInJson;
     };
@@ -134,6 +175,9 @@ class Product{
         // string is in the form below
         //{"code":"tgtwdNbCnwx","name":"name 1","brand":"br 2","description":"df","dosage_instruction":"dfg","price":123.000000,"quantity":13,"category":"des","requires_prescription":1}
         // You need to extract value for each field and update private attributes declared above.
+        
+
+
 
     };
 };
