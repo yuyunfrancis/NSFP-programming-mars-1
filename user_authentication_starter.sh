@@ -60,7 +60,7 @@ register_credentials() {
     read -p 'Enter your username: ' username
     read -p "Enter your email: " email
 
-    if ! is_valid_email "$email" || check_existing_username "$email"; then
+    if ! is_valid_email "$email" || check_username "$username"; then
         echo -e "\nInvalid email or user with username '$username' or email '$email' already exists. Registration failed."
     else
         stty -echo
@@ -283,7 +283,7 @@ get_credentials() {
     read -p "Enter your username: " username
     stty -echo
     read -p "Enter your password: " password
-    stty echo
+    stty -echo
     echo
 
     if verify_credentials "$username" "$password"; then
@@ -330,7 +330,7 @@ delete_user() {
         sed -i "/^$username:/d" "$credentials_file"
         echo "User '$username' deleted successfully."
     else
-        echo "User '$username' not found."
+        echo -e "\nUser '$username' not found."
     fi
 }
 
@@ -350,7 +350,6 @@ display_all_users() {
 
 log_out() {
     echo -e "\nLogging out..."
-
     if [ -f .logged_in ]; then
         logged_in_user=$(cat .logged_in)
         awk -v usr="$logged_in_user" 'BEGIN { FS = ":"; OFS = ":" } $1 == usr { $6 = 0 } 1' "$credentials_file" > "$credentials_file.tmp"
@@ -429,6 +428,7 @@ while true; do
             log_out
             ;;
         4)
+            log_out
             echo "Exiting..."
             break
             ;;
