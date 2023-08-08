@@ -16,7 +16,6 @@ class FileHandler{
     vector<Product> readJsonFile(){
 
         // Add code here
-        string filename;
         vector<Product> prodList;
         vector<string> prodLines;
         string prodLine;
