@@ -98,6 +98,7 @@ public:
         // it prompts a user and return user input in form of text. Text can be made by multiple words.
         string name;
         cout << promptText;
+        cin.ignore();
         getline(cin, name);
         return name;
     }
@@ -107,10 +108,9 @@ public:
         // TODO Add code to prompt user for input for any Product Numeric field
         // method takes text to display e.g: "Enter Product Name:"
         // it prompts a user and return user input in form of text. Text can be made by multiple words.
-        string numeric;
+        float value;
         cout << promptText;
-        getline(cin, numeric);
-        float value = stof(numeric);
+        cin >> value;
         return value;
     }
 
@@ -146,7 +146,7 @@ public:
         // TODO Add code that calls promptTextField() method and prompt user for entering product dosageInstruction and update the dosage instruction field.
         dosageInstruction = promptTextField("Enter Dosage Instruction for the product: ");
         // TODO Add code that calls promptNumberField() method and prompt user for entering product quantity and update the quantity field.
-        quantity = int(promptNumberField("Enter Quantity for the product: "));
+        quantity = promptNumberField("Enter Quantity for the product: ");
         // TODO Add code that calls promptNumberField() method and prompt user for entering product price and update the price field.
         price = promptNumberField("Enter Price for the product: ");
         // TODO Add code that calls promptRequirePrescription() method and prompt user for entering product requires presc and update the requiresprescription field.
@@ -182,8 +182,6 @@ public:
             //    int idx = 0;
             int key_start_idx = txt.find('"', idx);
             int key_end_idx = txt.find('"', key_start_idx + 1);
-            // Implement a switch statement to assign to the specific attribute
-            // based on the key
             string key = txt.substr(key_start_idx + 1, key_end_idx - key_start_idx - 1);
             int value_start_idx = txt.find(":", key_end_idx) + 1; // Index of the first quote after the colon
             int value_end_idx;
@@ -191,7 +189,7 @@ public:
                 value_start_idx += 1;
                 value_end_idx = txt.find('"', value_start_idx + 1);
             } else { // If the value is a number
-                // Here the value_start will be the first number of the value column
+                // Here the value_start_idx will be the first number of the value column
                 value_end_idx = txt.find(",", value_start_idx);
                 if (value_end_idx == -1) { // If no matches found meaning we are at the end of the json string
                     value_end_idx = txt.find("}", value_start_idx);
