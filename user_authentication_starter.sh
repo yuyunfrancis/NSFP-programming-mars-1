@@ -436,10 +436,4 @@ while true; do
             echo "Invalid choice. Try again"
             ;;
     esac
-
-
 done
-
-
-#### BONUS
-#1. Implement a function to delete an account from the file
