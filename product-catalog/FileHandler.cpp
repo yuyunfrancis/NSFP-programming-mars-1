@@ -35,7 +35,6 @@ class FileHandler{
         cout<<"Reading "<<filename<< " File........."<<endl;
 
         ifstream prodsFile(filename);
-        cin.ignore();
         while (getline(prodsFile, prodLine)){
              
                 prodLines.push_back(prodLine);
