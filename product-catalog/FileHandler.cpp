@@ -13,6 +13,12 @@ class FileHandler{
     public:
     string filename;
 
+    /**
+     * Reads the json file and returns a vector of products.
+     *
+     * 
+     * @return vector<Product> Returns a vector of products read from the json file.
+     */
     vector<Product> readJsonFile(){
 
         // Add code here
@@ -29,7 +35,7 @@ class FileHandler{
         cout<<"Reading "<<filename<< " File........."<<endl;
 
         ifstream prodsFile(filename);
-
+        cin.ignore();
         while (getline(prodsFile, prodLine)){
              
                 prodLines.push_back(prodLine);
@@ -43,10 +49,17 @@ class FileHandler{
         }          
         
         cout<<"Finished Reading "<<filename<< " File........."<<endl;
+        prodsFile.close();
 
         return prodList;
     };
 
+    /**
+     * Appends a product to a json file
+     *
+     * @param p A product object to be added to the file.
+     * 
+     */
     void saveToJsonFile(Product p){
 
         vector<Product> pList;
@@ -71,27 +84,60 @@ class FileHandler{
             return;
 
         }
+        input_file.close();
 
         // Delete the file.
-    int ret = remove(filename.c_str());
-    if (ret != 0) {
-        std::cout << "Error deleting file: " << strerror(errno) << "\n";
-        return ;
+        int ret = remove(filename.c_str());
+        if (ret != 0) {
+            std::cout << "Error deleting file: " << strerror(errno) << "\n";
+            return ;
+        }
+
+        ofstream jsonFile(filename);
+        jsonFile<<"["<<endl;
+        for(int i=0; i<pList.size(); i++){
+
+            if(i< pList.size() -1){
+                jsonFile<< pList.at(i).toJson()<<","<<endl;
+            }
+            else{
+                jsonFile<< pList.at(i).toJson()<<endl;
+            }
+        }
+        jsonFile<<"]"<<endl;      
+
+
     }
 
-    ofstream jsonFile(filename);
-    jsonFile<<"["<<endl;
-    for(int i=0; i<pList.size(); i++){
+    /**
+     * Saves a vector of products to a json file
+     *
+     * @param pList Vector of products to be saved.
+     * 
+     */
+    void saveListToJsonFile(vector<Product> pList){
 
-        if(i< pList.size() -1){
-            jsonFile<< pList.at(i).toJson()<<","<<endl;
+        // Delete the file.
+        int ret = remove(filename.c_str());
+        if (ret != 0) {
+            std::cout << "Error deleting file: " << strerror(errno) << "\n";
+            return ;
         }
-        else{
-            jsonFile<< pList.at(i).toJson()<<endl;
+
+        ofstream jsonFile(filename);
+        jsonFile<<"["<<endl;
+        for(int i=0; i<pList.size(); i++){
+
+            if(i< pList.size() -1){
+                jsonFile<< pList.at(i).toJson()<<","<<endl;
+            }
+            else{
+                jsonFile<< pList.at(i).toJson()<<endl;
+            }
         }
-    }
-    jsonFile<<"]"<<endl;      
+        jsonFile<<"]"<<endl;      
 
 
     }
 };
+
