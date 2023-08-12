@@ -18,7 +18,6 @@ public class Medication {
       this.processedStatus = false;
    }
 
-   // TODO: Add code to help you to create object/instance for this class in different way
    public Medication(String medicationID, String medicationName, String medicationDetails, String dosage, int quantity){
       this.ID = medicationID;
       this.name = medicationName;
@@ -31,7 +30,6 @@ public class Medication {
 
 
 
-   // TODO: Add code to help you to access or modify data members for this class
    public String getID() {
       return this.ID;
    }

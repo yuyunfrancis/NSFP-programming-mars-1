@@ -11,9 +11,7 @@ import org.json.simple.parser.ParseException;
 public class FileHandler {
 	
 	private String filePath = "prescriptions.json";
-	
 
-    // TODO:  Add missing code to be able to handle file
 
     public FileHandler() {
 
@@ -32,8 +30,6 @@ public class FileHandler {
             return new JSONArray();
         }
     }
-
-    // TODO:  Add missing code to be able to handle file
 
     public void writeJSONArrayToFile(JSONArray jsonArray) throws IOException {
         try (FileWriter fileWriter = new FileWriter(filePath)) {

@@ -35,6 +35,7 @@ public class PrescriptionManagement {
             System.out.println("\t1. Add Prescription");
             System.out.println("\t2. View Prescriptions");
             System.out.println("\t3. Delete Prescription");
+            System.out.println("\t4. Exit");
 
 
             choice = Integer.parseInt(inp.readLine());
@@ -44,9 +45,6 @@ public class PrescriptionManagement {
            switch (choice) {
               case 1:
 
-                   // TODO: Add code to get Prescription ID, Customer ID,  Doctor's Name
-                   // Don't forget to add code to save these information in the prescription
-//
                   String pID, cID, doctorsName;
                   System.out.println("Enter the prescription ID: ");
                   pID = inp.readLine();
@@ -109,8 +107,6 @@ public class PrescriptionManagement {
 
                   break;
               case 2:
-                   // TODO: Add code to retrieve all prescriptions in the file
-                   // Prescriptions must be returned in the array
 
                   ArrayList<Prescription> prescriptions = prescription.viewPrescription(); // TODO: Check if this assignment works
                   if(prescriptions.size()==0) {
@@ -140,11 +136,9 @@ public class PrescriptionManagement {
 
            	   break;
               case 3:
-                   // TODO: Add code to get the ID of the prescription you want to delete
                   String prescrID;
+                  System.out.println("Enter the prescription ID to delete: ");
                   prescrID = inp.readLine();
-
-
                   prescription.deletePrescription(prescrID);
                  break;
               case 4:
@@ -185,8 +179,7 @@ public class PrescriptionManagement {
 	              for (Object obj: jsonArray) {
 	                  JSONObject jsonObject = (JSONObject) obj;
 
-                   // TODO: Add code to get medication ID (it's named as code from medications/products file), name, price and quantity
-                   // medication ID, name, price and quantity should be casted to String
+
                     String medicationID = (String) jsonObject.get("code");
                     String medicationName = (String) jsonObject.get("name");
                     String medicationPrice = (String) jsonObject.get("price");
