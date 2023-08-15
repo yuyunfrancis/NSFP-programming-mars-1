@@ -58,10 +58,10 @@ register_credentials() {
     echo "===== User Registration ====="
 
     read -p 'Enter your username: ' username
-    read -p "Enter your email: " email
+    read -p "Enter your email: " fullName
 
-    if ! is_valid_email "$email" || check_username "$username"; then
-        echo -e "\nInvalid email or user with username '$username' or email '$email' already exists. Registration failed."
+    if check_username "$username"; then
+        echo -e "\nInvalid user with username '$username' already exists. Registration failed."
     else
         stty -echo
         read -p "Enter your password: " password
@@ -101,7 +101,7 @@ register_credentials() {
            role="normal"
        fi
 
-            echo "$username:$email:$hashed_password:$role:$salt:0" >> "$credentials_file"
+            echo "$username:$hashed_password:$salt:$fullName:$role:0" >> "$credentials_file"
             echo -e "\nRegistration successful. You can now login."
         fi
     fi
@@ -127,8 +127,8 @@ verify_credentials() {
 
     if check_username "$username"; then
         stored_credentials=$(grep "^$username:" "$credentials_file")
-        stored_password=$(echo "$stored_credentials" | cut -d ":" -f 3)
-        stored_salt=$(echo "$stored_credentials" | cut -d ":" -f 5)
+        stored_password=$(echo "$stored_credentials" | cut -d ":" -f 2)
+        stored_salt=$(echo "$stored_credentials" | cut -d ":" -f 3)
         status=$(echo "$stored_credentials" | cut -d ":" -f 6)
 
         if [ "$status" = "1" ]; then
@@ -155,16 +155,16 @@ get_user_role() {
     if [ -f "$credentials_file" ]; then
         user_data=$(grep "^$username:" "$credentials_file")
         if [ -n "$user_data" ]; then
-            echo "$user_data" | cut -d ":" -f 4
+            echo "$user_data" | cut -d ":" -f 5
         fi
     fi
 }
 
 check_user_is_logged_in() {
-    if [ -f .logged_in ]; then
-        logged_in_user=$(cat .logged_in)
+    if [ -f data/.logged_in ]; then
+        logged_in_user=$(cat data/.logged_in)
         stored_credentials=$(grep "^$logged_in_user:" "$credentials_file")
-        role=$(echo "$stored_credentials" | cut -d ":" -f 4)
+        role=$(echo "$stored_credentials" | cut -d ":" -f 5)
     else
         role="normal"
     fi
@@ -288,7 +288,8 @@ get_credentials() {
 
     if verify_credentials "$username" "$password"; then
         echo -e "\nLogin successful. Welcome, $username!"
-        echo "$username" > .logged_in
+        echo "$username" > data/.logged_in
+
 
         user_role=$(get_user_role "$username")
         case $user_role in
@@ -308,7 +309,8 @@ get_credentials() {
         esac
     else
         echo -e "\nLogin failed. Invalid credentials."
-        rm -f .logged_in
+        rm -f data/.logged_in
+
     fi
 }
 
@@ -350,12 +352,12 @@ display_all_users() {
 
 log_out() {
     echo -e "\nLogging out..."
-    if [ -f .logged_in ]; then
-        logged_in_user=$(cat .logged_in)
+    if [ -f data/.logged_in ]; then
+        logged_in_user=$(cat data/.logged_in)
         awk -v usr="$logged_in_user" 'BEGIN { FS = ":"; OFS = ":" } $1 == usr { $6 = 0 } 1' "$credentials_file" > "$credentials_file.tmp"
         mv "$credentials_file.tmp" "$credentials_file"
 
-        rm -f .logged_in
+        rm -f data/.logged_in
         echo "Logged out successfully."
     else
         echo "No user is currently logged in."
@@ -364,8 +366,8 @@ log_out() {
 
 
 ctrl_c_handler() {
-    if [ -f .logged_in ]; then
-        logged_in_user=$(cat .logged_in)
+    if [ -f data/.logged_in ]; then
+        logged_in_user=$(cat data/.logged_in)
         stored_credentials=$(grep "^$logged_in_user:" "$credentials_file")
         status=$(echo "$stored_credentials" | cut -d ":" -f 6)
 
@@ -409,10 +411,10 @@ while true; do
             get_credentials
             ;;
         2)
-            if [ -f .logged_in ]; then
-            logged_in_user=$(cat .logged_in)
+            if [ -f data/.logged_in ]; then
+            logged_in_user=$(cat data/.logged_in)
             stored_credentials=$(grep "^$logged_in_user:" "$credentials_file")
-            role=$(echo "$stored_credentials" | cut -d ":" -f 4)
+            role=$(echo "$stored_credentials" | cut -d ":" -f 5)
             
                 if [ "$role" = "admin" ]; then
                     register_credentials

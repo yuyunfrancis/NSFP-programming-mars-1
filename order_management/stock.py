@@ -57,12 +57,6 @@ class Stock:
     
     @staticmethod
     def load(infile: str):
-        """Loads the stock from an existing file
-        
-        Args: 
-            infile: input file to the function
-        """
-        #TODO: Implement the function
         with open(infile, 'r') as f:
             stock_data = json.load(f)
             products = [
@@ -72,20 +66,26 @@ class Stock:
                         category=data['category'], dosage_instruction=data['dosage_instruction'])
                 for data in stock_data]
             return Stock(products)
-    
+
     def __str__(self) -> str:
         """Returns a string representation of the stock
         """
-        stock_description = ""
-        for product in self.products:
-            stock_description += (
-                f"Code: {product.code}\n"
-                f"Name: {product.name}\n"
-                f"Brand: {product.brand}\n"
-                f"Description: {product.description}\n"
-                f"Quantity: {product.quantity}\n"
-                f"Price: {product.price}\n"
-                f"Requires Prescription: {product.requires_prescription}\n\n"
+        stock_description = "{:^4} | {:^38} | {:^25} | {:^15} | {:^50} | {:^8} | {:^15} | {:^20}\n".format(
+            "No.", "Code", "Name", "Brand", "Description", "Quantity", "Price", "Requires Prescription"
+        )
+        stock_description += "-" * 215 + "\n"
+
+        for idx, product in enumerate(self.products, start=1):
+            code_display = product.code[:20]  # Display only the first 20 characters of the code
+            name_display = product.name[:25]
+            brand_display = product.brand[:15]
+            description_display = product.description[:50]
+
+            stock_description += "{:^4} | {:^38} | {:^25} | {:^15} | {:^50} | {:^8} | {:^15.2f} | {:^20}\n".format(
+                idx, code_display, name_display, brand_display, description_display,
+                product.quantity, product.price, product.requires_prescription
             )
+
         return stock_description
+
         #TODO: Return the description of the stock with a nice output showing the ID, Name, Brand, Description, Quantity, Price, and the requires_prescription field

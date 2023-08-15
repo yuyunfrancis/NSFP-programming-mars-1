@@ -1,7 +1,9 @@
 from . import Stock, Cart, User, UserManagement, BookRecords, Wrapper, Prescription
 from .cart import Cart
+import os
 
 MSG_WRONG_INPUT = "Wrong input. Try again!"
+
 
 
 
@@ -38,6 +40,7 @@ class Menu:
         print("2. Remove from a cart")
         print("3. Clear the cart")
         print("4. Checkout")
+        print("5 Back")
 
     def display_analytics_menu(self):
         """Display the analytics menu"""
@@ -50,6 +53,7 @@ class Menu:
         print("3. Purchases for a user")
         print("4. Sales by an agent")
         print("5. Top sales")
+        print("6. Back")
 
     def run(self):
         """Run the menu and process user input"""
@@ -57,10 +61,8 @@ class Menu:
             print("\nMain Menu:")
             print("1. Order management")
             print("2. Analytics")
-            print("3. Exit")
-
+            print("3. Back")
             choice = input("Enter your choice: ")
-
             if choice == '1':
                 self.run_order_management_menu()
             elif choice == '2':
@@ -76,7 +78,6 @@ class Menu:
         while True:
             self.display_order_management_menu()
             choice = input("Enter your choice: ")
-
             if choice == '1':
                 self.add_to_cart()
             elif choice == '2':
@@ -85,11 +86,13 @@ class Menu:
                 self.clear_cart()
             elif choice == '4':
                 self.checkout()
+            elif choice == '5':
+                return  # Return to the previous menu
             else:
                 print(MSG_WRONG_INPUT)
 
             # Add this condition to return to the main menu only if explicitly chosen
-            if choice != '4':
+            if choice != '5':
                 return
 
     def run_analytics_menu(self):
@@ -108,6 +111,8 @@ class Menu:
                 self.sales_by_agent()
             elif choice == '5':
                 self.top_sales()
+            elif choice == '6':
+                return
             else:
                 print(MSG_WRONG_INPUT)
 
@@ -115,24 +120,54 @@ class Menu:
         """Add a product to the cart"""
         # TODO: Implement the logic to add a product to the cart
         print("Available Products:")
-        for product in self.stock.products:
-            print(f"ID: {product.code}, Name: {product.name}, Price: {product.price}, Quantity: {product.quantity}")
+        # for product in self.stock.products:
+        #     print(f"ID: {product.code}, Name: {product.name}, Price: {product.price}, Quantity: {product.quantity}")
+        print(self.stock.__str__())
 
         # Ask the user to enter the product ID and quantity
-        product_id = str(input("Enter the product ID to add to the cart: "))
+        product_id = int(input("Enter choice to add to the cart: "))
         quantity = int(input("Enter the quantity to add: "))
-        self.cart.add(product_id, quantity)
+        self.cart.add(self.stock.products[product_id - 1].code, quantity)
+        self.run_order_management_menu()
         # pass
 
     def remove_from_cart(self):
         """Remove a product from the cart"""
-        # TODO: Implement the logic to remove a product from the cart
-        pass
+        self.cart.display_cart()
+
+        if not self.cart.products:
+            print("Cart is empty. Nothing to delete.")
+            self.run_order_management_menu()
+            return
+        product_code = str(input("Enter the product code to remove: "))
+        self.cart.remove_from_cart(product_code)
+        self.run_order_management_menu()
+
+
+    # TODO: Implement the logic to remove a product from the cart
+        #pass
 
     def clear_cart(self):
         """Clear the cart"""
         # TODO: Implement the logic to clear the cart
-        pass
+        #pass
+        self.cart.display_cart()
+
+        if not self.cart.products:
+            print("Cart is already empty.")
+            input("Press Enter to go back to the cart menu...")
+            self.run_order_management_menu()
+            return
+
+        confirmation = input("Are you sure you want to clear the cart? (y/n): ")
+        if confirmation.lower() == 'y':
+            self.cart.clear()
+            print("Cart cleared successfully.")
+        elif confirmation.lower() == 'n':
+            print("Cart was not cleared.")
+
+        input("Press Enter to go back to the cart menu...")
+        self.run_order_management_menu()
 
     def checkout(self):
         """Checkout the cart"""

@@ -19,21 +19,20 @@ def show_salesperson_menu(menu):
         print("******************************************")
         print("1. Order Management")
         print("2. Get Analytics")
-        print("3. Back")
+        print("3. Exit")
 
         choice = input("Enter your choice: ")
 
         if choice == '1':
             menu.run_order_management_menu()
         elif choice == '2':
-            menu.view_cart()
+            menu.run_analytics_menu()
         elif choice == '3':
-            menu.checkout()
-        elif choice == '4':
-            print("Exiting the application.")
+            print("Exiting the application...")
             break
         else:
             print("Invalid choice. Please select a valid option.")
+            continue
 
 
 def show_admin_menu(menu):
@@ -45,7 +44,6 @@ def show_admin_menu(menu):
         print("4. Exit")
 
         choice = input("Enter your choice: ")
-
         if choice == '1':
             menu.add_product_to_stock()
         elif choice == '2':
