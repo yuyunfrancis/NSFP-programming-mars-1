@@ -272,8 +272,37 @@ class Menu:
 
     def total_income(self):
         """Calculate the total income from purchases"""
-        # TODO: Implement the logic to calculate total income
-        pass
+        total_income = 0
+
+        with open(self.records_file, 'r') as sales_file:
+            sales_data = json.load(sales_file)
+
+            print("Sales Data:")
+            print(
+                "|{:<25} | {:<15} | {:<15} {:<20} | {:<15} | {:<15}|".format("Timestamp", "Total Price", "Customer ID",
+                                                                             "Salesperson", "Prescription ID",
+                                                                             "Product Details"))
+            print("=" * 155)
+
+            for sale_entry in sales_data:
+                total_income += sale_entry["total_price"]
+
+                product_details = ""
+                for product_id, quantity in sale_entry["cart_items"].items():
+                    product = self.stock.getProductByID(product_id)
+                    product_details += f"{product.name} ({product_id}): {quantity}\n"
+
+                print("{:<25} | {:<15.2f} | {:<15} | {:<20} | {:<15} | {:<15}|".format(
+                    sale_entry["timestamp"],
+                    sale_entry["total_price"],
+                    sale_entry["customerID"],
+                    sale_entry["salesperson"],
+                    sale_entry.get("prescriptionID", ""),
+                    product_details
+                ))
+
+            print("-" * 105)
+        print("{:<25} {:<15} {:<15} {:<20} {:<15}".format("Total Income:", total_income, "", "", ""))
 
     def prescription_statistics(self):
         """Display prescription statistics"""
@@ -282,13 +311,75 @@ class Menu:
 
     def purchases_for_user(self):
         """Display purchases for a user"""
-        # TODO: Implement the logic to display purchases for a user
-        pass
+        user_id = input("Enter the user ID: ")
+
+        with open(self.records_file, 'r') as sales_file:
+            sales_data = json.load(sales_file)
+
+            user_sales = [sale_entry for sale_entry in sales_data if sale_entry["customerID"] == user_id]
+
+            if not user_sales:
+                print("No purchases found for the specified user.")
+                return
+
+            print("Purchases for User:")
+            print("{:<25} {:<15} {:<15} {:<20} {:<15} {:<15}".format("Timestamp", "Total Price", "Customer ID",
+                                                                     "Salesperson", "Prescription ID",
+                                                                     "Product Details"))
+            print("=" * 105)
+
+            for sale_entry in user_sales:
+                product_details = ""
+                for product_id, quantity in sale_entry["cart_items"].items():
+                    product = self.stock.getProductByID(product_id)
+                    product_details += f"{product.name} ({product_id}): {quantity}\n"
+
+                print("{:<25} {:<15.2f} {:<15} {:<20} {:<15} {:<15}".format(
+                    sale_entry["timestamp"],
+                    sale_entry["total_price"],
+                    sale_entry["customerID"],
+                    sale_entry["salesperson"],
+                    sale_entry.get("prescriptionID", ""),
+                    product_details
+                ))
+
+            print("-" * 105)
 
     def sales_by_agent(self):
         """Display sales by an agent"""
-        # TODO: Implement the logic to display sales by an agent
-        pass
+        agent_name = input("Enter the agent's name: ")
+
+        with open(self.records_file, 'r') as sales_file:
+            sales_data = json.load(sales_file)
+
+            agent_sales = [sale_entry for sale_entry in sales_data if sale_entry["salesperson"] == agent_name]
+
+            if not agent_sales:
+                print("No sales found for the specified agent.")
+                return
+
+            print("Sales by Agent:")
+            print("{:<25} {:<15} {:<15} {:<20} {:<15} {:<15}".format("Timestamp", "Total Price", "Customer ID",
+                                                                     "Salesperson", "Prescription ID",
+                                                                     "Product Details"))
+            print("=" * 105)
+
+            for sale_entry in agent_sales:
+                product_details = ""
+                for product_id, quantity in sale_entry["cart_items"].items():
+                    product = self.stock.getProductByID(product_id)
+                    product_details += f"{product.name} ({product_id}): {quantity}\n"
+
+                print("{:<25} {:<15.2f} {:<15} {:<20} {:<15} {:<15}".format(
+                    sale_entry["timestamp"],
+                    sale_entry["total_price"],
+                    sale_entry["customerID"],
+                    sale_entry["salesperson"],
+                    sale_entry.get("prescriptionID", ""),
+                    product_details
+                ))
+
+            print("-" * 105)
 
     def top_sales(self):
         """Display top sales"""

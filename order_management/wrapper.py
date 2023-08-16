@@ -54,10 +54,9 @@ class Wrapper:
                 "salesperson": self.agentID,
                 "price": product.price,
                 "total_price": total_price,
-                "prescriptionID": prescription.get(self.prescriptions_file, prescription.PrescriptionID),
+                "prescriptionID": prescription.PrescriptionID,
                 "cart_items": cart.products
             }
-            self.sales.append(sale)
             self.sales.append(sale)
         # Create a sale record
         # Clear the cart after successful checkout
