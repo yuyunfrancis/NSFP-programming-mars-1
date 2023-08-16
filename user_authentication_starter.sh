@@ -3,6 +3,7 @@
 # PROJECT_HOME="linux"
 LOCAL_DATA_STORAGE="data"
 credentials_file="$LOCAL_DATA_STORAGE/credentials.txt"
+
 logged_in_user=""
 
 creata_data_folder(){
@@ -294,12 +295,16 @@ get_credentials() {
         user_role=$(get_user_role "$username")
         case $user_role in
             "admin")
+                clear
                 admin_options
                 ;;
             "salesperson")
-                salesperson_options
+                clear
+                python3 __main__.py
+                log_out
                 ;;
             "normal")
+                clear
                 normal_user_options
                 ;;
             *)
@@ -401,13 +406,13 @@ while true; do
     echo "\nselect an option"
     echo "1. Login"
     echo "2. Register"
-    echo "3. Logout"
-    echo "4. close the program"
+    echo "3. close the program"
 
     read -p "Enter your choice: " choice
 
     case $choice in
-        1)
+        1)  
+            clear
             get_credentials
             ;;
         2)
@@ -423,13 +428,11 @@ while true; do
                 fi
             else
             role="normal"
+            clear
             register_credentials
             fi
             ;;
         3)
-            log_out
-            ;;
-        4)
             log_out
             echo "Exiting..."
             break

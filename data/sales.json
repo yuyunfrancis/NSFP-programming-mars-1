@@ -62,5 +62,31 @@
         "cart_items": {
             "R8Ibu4fwETzZk5CUWsHwjfSMiVJV9jQMm": 1
         }
+    },
+    {
+        "timestamp": "2023-08-16T23:07:06.759921",
+        "customerID": "francis",
+        "name": "Name 3",
+        "doctorName": "Peter",
+        "salesperson": "yuyun",
+        "price": 1490.900024,
+        "total_price": 5963.600096,
+        "prescriptionID": "PHA1",
+        "cart_items": {
+            "R8Ibu4fwETzZk5CUWsHwjfSMiVJV9jQMm": 4
+        }
+    },
+    {
+        "timestamp": "2023-08-16T23:16:25.524249",
+        "customerID": "francis",
+        "name": "Name 3",
+        "doctorName": "Crakul",
+        "salesperson": "yuyun",
+        "price": 1490.900024,
+        "total_price": 5963.600096,
+        "prescriptionID": "QUA1",
+        "cart_items": {
+            "R8Ibu4fwETzZk5CUWsHwjfSMiVJV9jQMm": 4
+        }
     }
 ]

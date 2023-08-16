@@ -24,13 +24,16 @@ def show_salesperson_menu(menu):
         choice = input("Enter your choice: ")
 
         if choice == '1':
+            os.system('clear')
             menu.run_order_management_menu()
         elif choice == '2':
+            os.system('clear')
             menu.run_analytics_menu()
         elif choice == '3':
             print("Exiting the application...")
             break
         else:
+            os.system('clear')
             print("Invalid choice. Please select a valid option.")
             continue
 
@@ -45,15 +48,19 @@ def show_admin_menu(menu):
 
         choice = input("Enter your choice: ")
         if choice == '1':
+            os.system('clear')
             menu.add_product_to_stock()
         elif choice == '2':
+            os.system('clear')
             menu.view_stock()
         elif choice == '3':
+            os.system('clear')
             menu.view_sales_records()
         elif choice == '4':
             print("Exiting the application.")
             break
         else:
+            os.system('clear')
             print("Invalid choice. Please select a valid option.")
 
 
@@ -68,15 +75,19 @@ def show_normal_menu(menu):
         choice = input("Enter your choice: ")
 
         if choice == '1':
+            os.system('clear')
             menu.add_to_cart()
         elif choice == '2':
+            os.system('clear')
             menu.view_cart()
         elif choice == '3':
+            os.system('clear')
             menu.checkout()
         elif choice == '4':
             print("Exiting the application.")
             break
         else:
+            os.system('clear')
             print("Invalid choice. Please select a valid option.")
 
 

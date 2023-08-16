@@ -9,17 +9,6 @@ MSG_WRONG_INPUT = "Wrong input. Try again!"
 
 
 class Menu:
-    """Represents the menu class for the project
-
-    Attributes: 
-        stock: stock variable
-        profiles: user management module
-        pharmacist: account of the salesperson
-        records_file: path to the file containing the sales
-        prescriptions_file: path to the file containing the prescriptions.
-        stock_file: path to the file containing the stock data
-    """
-
     def __init__(self, stock: Stock, profiles: UserManagement, pharmacist: User, records_file: str,
                  prescriptions_file: str, stock_file: str, wrapper: Wrapper) -> None:
         self.wrapper = wrapper
@@ -122,8 +111,6 @@ class Menu:
         """Add a product to the cart"""
         # TODO: Implement the logic to add a product to the cart
         print("Available Products:")
-        # for product in self.stock.products:
-        #     print(f"ID: {product.code}, Name: {product.name}, Price: {product.price}, Quantity: {product.quantity}")
         print(self.stock.__str__())
 
         # Ask the user to enter the product ID and quantity
@@ -131,10 +118,12 @@ class Menu:
         quantity = int(input("Enter the quantity to add: "))
         self.cart.add(self.stock.products[product_id - 1].code, quantity)
         self.run_order_management_menu()
+
+        return self.display_order_management_menu()
         # pass
 
     def remove_from_cart(self):
-        """Remove a product from the cart"""
+
         self.cart.display_cart()
 
         if not self.cart.products:
@@ -145,13 +134,7 @@ class Menu:
         self.cart.remove_from_cart(product_code)
         self.run_order_management_menu()
 
-    # TODO: Implement the logic to remove a product from the cart
-    # pass
-
     def clear_cart(self):
-        """Clear the cart"""
-        # TODO: Implement the logic to clear the cart
-        # pass
         self.cart.display_cart()
 
         if not self.cart.products:
@@ -237,7 +220,6 @@ class Menu:
                 Date=prescription_data["Date"]
             )
 
-            # Verify if products in cart are in prescription and match required quantities
             for product_code, quantity in self.cart.products.items():
                 product = self.stock.getProductByID(product_code)
                 if not prescription.medecineInPrescription(product, quantity):
@@ -306,8 +288,38 @@ class Menu:
 
     def prescription_statistics(self):
         """Display prescription statistics"""
-        # TODO: Implement the logic to display prescription statistics
-        pass
+        with open(self.prescriptions_file, 'r') as file:
+            prescriptions = json.load(file)
+
+            total_prescriptions = len(prescriptions)
+            total_medications = sum(len(prescription["Medications"]) for prescription in prescriptions)
+
+            medication_counts = {}  # To store the count of each medication
+            for prescription in prescriptions:
+                for medication in prescription["Medications"]:
+                    medication_id = medication["id"]
+                    medication_name = medication["name"]
+                    medication_quantity = medication["quantity"]
+
+                    if medication_id in medication_counts:
+                        medication_counts[medication_id]["count"] += medication_quantity
+                    else:
+                        medication_counts[medication_id] = {
+                            "name": medication_name,
+                            "count": medication_quantity
+                        }
+
+            print("Prescription Statistics:")
+            print("{:<25} {:<15}".format("Total Prescriptions:", total_prescriptions))
+            print("{:<25} {:<15}".format("Total Medications:", total_medications))
+            print("\nMedication Usage:")
+            print("{:<25} {:<15}".format("Medication Name", "Total Quantity"))
+            print("=" * 40)
+
+            for medication_id, data in medication_counts.items():
+                print("{:<25} {:<15}".format(data["name"], data["count"]))
+
+            print("=" * 40)
 
     def purchases_for_user(self):
         """Display purchases for a user"""
@@ -383,7 +395,33 @@ class Menu:
 
     def top_sales(self):
         """Display top sales"""
-        # TODO: Implement the logic to display top sales
-        pass
+        with open(self.records_file, 'r') as sales_file:
+            sales_data = json.load(sales_file)
+
+            # Sort sales by total_price in descending order
+            sorted_sales = sorted(sales_data, key=lambda x: x["total_price"], reverse=True)
+
+            print("Top Sales:")
+            print("|{:<25} | {:<15} | {:<15} {:<20} | {:<15} | {:<15}".format("Timestamp", "Total Price", "Customer ID",
+                                                                              "Salesperson", "Prescription ID",
+                                                                              "Product Details"))
+            print("=" * 105)
+
+            for sale_entry in sorted_sales:
+                product_details = ""
+                for product_id, quantity in sale_entry["cart_items"].items():
+                    product = self.stock.getProductByID(product_id)
+                    product_details += f"{product.name} ({product_id}): {quantity}\n"
+
+                print("{:<25} {:<15.2f} {:<15} {:<20} {:<15} {:<15}".format(
+                    sale_entry["timestamp"],
+                    sale_entry["total_price"],
+                    sale_entry["customerID"],
+                    sale_entry["salesperson"],
+                    sale_entry.get("prescriptionID", ""),
+                    product_details
+                ))
+
+            print("-" * 105)
 
     # **CHALLENGE** (BONUS): Can you implement the menu to work as a USSD application? Implement and show your design
