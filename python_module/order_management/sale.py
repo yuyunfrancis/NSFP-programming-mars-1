@@ -1,3 +1,5 @@
+import json
+
 class Sale:
     """Class repreenting a sale that was successfully committed to the records.
 
@@ -35,5 +37,16 @@ class Sale:
         #TODO: Return a string that shows the product sold, its unit price
         # the quantity, timestamp, and the total cost in a nice way.
         
-        pass
+        sale = {}
+        sale['id'] = self.id
+        sale['name'] = self.name
+        sale['quantity'] = self.quantity
+        sale['price'] = self.price
+        sale['purchase_price'] = self.purchase_price
+        sale['timestamp'] = self.timestamp
+        sale['customerID'] = self.customerID
+        sale['salesperson'] = self.salesperson
+        sale['prescriptionID'] = self.prescriptionID
+
+        return json.dumps(sale)
 

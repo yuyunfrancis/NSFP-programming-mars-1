@@ -26,6 +26,10 @@ class BookRecords:
         #TODO: In the format below, return a representation of the records
         # |      # | Date                | Customer   | Medication | Quantity | Purchase Price | Prescription |
         # |      1 | 2023-06-03 21:23:25 | doe        | Quinine    |        3 |       1400 RWF | PHA1         |
+
+        print(f"|\t#|Date\t|Customer\t|Medication\t|Quantity\t|Purchase Price\t|Prescription\t|")
+        for i,transaction in enumerate(self.transactions):
+            print(f"|\t{i+1}|{transaction.timestamp}\t|{transaction.customerID}\t|{transaction.name}\t|{transaction.quantity}\t|{transaction.purchase_price}\t|{transaction.prescriptionID}\t|")
     
     def reportOnPrescriptions(self) -> str:
         """Reports on prescription sales.
@@ -39,6 +43,10 @@ class BookRecords:
 
         #TODO: output in the following format, the results: 
         # |    # | Prescription ID | Total Price |
+        
+        print(f"|\t#|Prescription ID\t|Total Price\t|")
+        for i,transaction in enumerate(self.transactions):
+            print(f"|\t{i+1}|{transaction.prescriptionID}\t|{transaction.purchase_price}\t|")
 
     def purchasesByUser(self, customerID: str):
         """Reports on the sales performed by a customer.
@@ -50,7 +58,7 @@ class BookRecords:
             
         """
         #TODO: Query the transactions to the `transactions` list below
-        transactions = None
+        transactions = [transaction for transaction in self.transactions if transaction.customerID == customerID]
 
         return BookRecords(transactions).__str__()
 
@@ -64,7 +72,8 @@ class BookRecords:
             
         """
         #TODO: Query the transactions to the `transactions` list below
-        transactions = None
+        transactions = [transaction for transaction in self.transactions if transaction.salesperson == salesperson]
+        
 
         # return the string representation
         return BookRecords(transactions).__str__()
@@ -106,4 +115,10 @@ class BookRecords:
         """
         #TODO: Implement the function. Make sure to handle the cases where
         # the file does not exist.
-        return NotImplemented
+        try:
+            with open(infile, 'r') as file:
+                data=json.load(file)
+                transactions = [Sale(transaction["id"], transaction["name"], transaction["quantity"], transaction["price"], transaction["purchase_price"], transaction["timestamp"], transaction["customerID"], transaction["salesperson"], transaction["prescriptionID"]) for transaction in data]
+                return BookRecords(transactions)
+        except IOError:
+            print("File not found!!")

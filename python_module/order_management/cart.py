@@ -25,15 +25,18 @@ class Cart:
         #TODO: If the product was already in the cart, increment the quantity
         
         #TODO: After the checks, add the product to the dictionary
-        index_of_item = next((index for (index, product) in enumerate(self.products) if product["id"] == productCode))
-        if (self.products[index_of_item]["quantity"] + quantity <= self.stock.getProductByID(productCode)["quantity"] and quantity > 0):
-            self.products[productCode] = self.stock.getProductByID(productCode)
-
+        if self.products.get(productCode) is not None:
+            if (self.products[productCode]["quantity"] + quantity <= self.stock.getProductByID(productCode)["quantity"] and quantity > 0):
+                self.products[productCode] = self.stock.getProductByID(productCode).quantity
+        else:
+            if (quantity > 0 and self.stock.getProductByID(productCode)["quantity"] >= quantity):
+                self.produts[productCode] = quantity
     def __str__(self) -> str:
         """String representation of the cart
         """
         #TODO: Return a string representation of a cart that shows the products, their quantity, unit price, total price. And also the total price of the cart
         # Feel free to format it the way you want to
+
         return NotImplemented
 
     def remove(self, code):

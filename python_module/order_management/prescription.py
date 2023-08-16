@@ -20,6 +20,7 @@ class Prescription:
         self.PrescriptionID = PrescriptionID
         self.Medications = Medications
         self.CustomerID = CustomerID
+        self.Date = Date
 
     def medecineInPrescription(self, product: Product, quantity: int) -> bool:
         """Verifies if a medecine with the specified quantity is included in a prescription
@@ -32,6 +33,7 @@ class Prescription:
         """
         #TODO: Implement the function
         # 
+        
         return NotImplemented
         
     def markComplete(self, product: Product):
@@ -43,6 +45,7 @@ class Prescription:
         Returns: None
         """
         #TODO: Change the value "ProcessedStatus" of the relevant product to True
+
         
 
         return NotImplemented
@@ -60,6 +63,16 @@ class Prescription:
         #TODO: Update the prescription that is being edited in the loaded data
 
         #TODO: Save the updated object
+        try:
+            with open(outfile, 'rw') as file:
+                prescriptions = json.load(file)
+                for prescription in prescriptions:
+                    if prescription["PrescriptionID"] == self.PrescriptionID:
+                        prescription = self
+                        break
+                json.dump(prescriptions, file)
+        except IOError:
+            print("File not found")
     
     @classmethod
     def get(cls, infile: str, id: str):
@@ -73,3 +86,13 @@ class Prescription:
         """
         #TODO: Load the file and find the object with the relevant ID
         #TODO: Return the relevant prescription
+
+        try:
+            with open(infile, 'r') as file:
+                prescriptions = json.load(file)
+                for prescription in prescriptions:
+                    if prescription["PrescriptionID"] == id:
+                        return prescription
+                    
+        except IOError:
+            print("File not found")
