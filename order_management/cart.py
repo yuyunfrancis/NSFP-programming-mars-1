@@ -32,9 +32,11 @@ class Cart:
                 price = product.price * quantity
                 trimmed_id = product.code[:20] if len(product.code) > 20 else product.code
                 print("{:<20} | {:<20} | {:^10} | {:>15}".format(product.name, trimmed_id, quantity, price))
+                print("-" * 75)
 
-            print("-" * 75)
+            # print("-" * 75)
             print("{:^20} | {:^20} | {:^10} | {:>15}".format("Total Price", "", "", self.cost))
+            print("-" * 75)
 
         except ValueError as e:
             print(e)
@@ -46,14 +48,14 @@ class Cart:
             return
 
         print("Cart Contents:")
-        print("{:<10} {:<30} {:<10} {:<10}".format("Product ID", "Product Name", "Quantity", "Price"))
+        print("|{:<10} | {:<30} | {:<10} | {:<10}".format("Product ID", "Product Name", "Quantity", "Price"))
         print("=" * 60)
 
         for product_code, quantity in self.products.items():
             product = self.stock.getProductByID(product_code)
-            print("{:<10} {:<30} {:<10} {:<10}".format(product.code, product.name, quantity, product.price))
+            print("|{:<10} | {:<30} | {:<10} | {:<10}|".format(product.code, product.name, quantity, product.price))
 
-        print("=" * 60)
+            print("-" * 60)
 
     def __str__(self) -> str:
         """String representation of the cart

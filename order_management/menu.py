@@ -179,8 +179,10 @@ class Menu:
                 return
 
             print("Prescription Data:")
-            print("{:<15} {:<20} {:<25} {:<25} {:<40} {:<15}".format("Prescription ID", "Doctor Name", "Customer ID",
-                                                                     "Medication Name", "Medications", "Date"))
+            print("|{:<15} | {:<20} | {:<25} | {:<25} {:<40} | {:<15}|".format("Prescription ID", "Doctor Name",
+                                                                               "Customer ID",
+                                                                               "Medication Name", "Medications",
+                                                                               "Date"))
             print("=" * 125)
 
             for prescription in prescriptions:
@@ -194,14 +196,14 @@ class Menu:
                     medication_id = med['id']
                     medication_name = med['name']
                     medication_quantity = med['quantity']
+                    print("| {:<15} | {:<20} | {:<25} | {:<25} | {:<40} | {:<15}|".format(prescription_id, doctor_name,
+                                                                                          customer_id,
+                                                                                          medication_name,
+                                                                                          f"{medication_quantity} {medication_id}",
+                                                                                          date))
+                    print("-" * 125)
 
-                    print(
-                        "{:<15} {:<20} {:<25} {:<25} {:<40} {:<15}".format(prescription_id, doctor_name, customer_id,
-                                                                           medication_name,
-                                                                           f"{medication_quantity} {medication_id}",
-                                                                           date))
-
-            print("=" * 125)
+            # print("=" * 125)
 
     # Call the function with the prescription file path
     def checkout(self):
@@ -243,15 +245,30 @@ class Menu:
                         f"Product {product.name} with code {product.code} and quantity {quantity} not found in "
                         f"prescription or quantity does not match.")
                     return
+            self.update_product_quantities(self.cart)
+
             self.wrapper.checkout(self.cart, customer_id, prescription)
 
-        # Display the sales
-        # print("\nSales:")
-        # for sale in self.wrap.sales:
-        #     print(sale)
-
-        # Clear the cart after successful checkout
+            with open(self.records_file, 'r+') as sales_file:
+                sales_data = json.load(sales_file)
+                sales_data.append(self.wrapper.sales[-1])  # Append the last sale
+                sales_file.seek(0)
+                json.dump(sales_data, sales_file, indent=4)
+                sales_file.truncate()
+                print("Sales records updated successfully")
         self.cart.clear()
+
+    def update_product_quantities(self, cart):
+        with open(self.stock_file, 'r+') as file:
+            products = json.load(file)
+            for product_code, quantity in cart.products.items():
+                product = next((p for p in products if p["code"] == product_code), None)
+                if product:
+                    product["quantity"] -= quantity
+
+            file.seek(0)
+            json.dump(products, file, indent=4)
+            file.truncate()
 
     def total_income(self):
         """Calculate the total income from purchases"""

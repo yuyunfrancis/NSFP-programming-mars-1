@@ -102,7 +102,7 @@ if __name__ == '__main__':
     # Create an instance of the menu
     stock = Stock.load(stock_file)
     cart = Cart(stock=stock)
-    wrap = Wrapper(stock, logged_in_user.username)
+    wrap = Wrapper(stock, logged_in_user.username, prescription_file)
     books = BookRecords.load(sales_file)
     menu = Menu(stock, profiles, logged_in_user, sales_file, prescription_file, stock_file, wrapper=wrap)
 

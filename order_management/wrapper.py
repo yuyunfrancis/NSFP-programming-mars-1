@@ -18,10 +18,11 @@ class Wrapper:
         agentID: the username of the pharmacist running the program
     """
 
-    def __init__(self, stock: Stock, agentID: str) -> None:
+    def __init__(self, stock: Stock, agentID: str, prescriptions_file: str,) -> None:
         self.sales = []
         self.stock = stock
         self.agentID = agentID
+        self.prescriptions_file = prescriptions_file
 
     def checkout(self, cart: Cart, customer_id: str, prescription: Prescription = None):
         """Handles the checkout procedure of the program.
@@ -43,26 +44,26 @@ class Wrapper:
         for product_code, quantity in cart.products.items():
             product = self.stock.getProductByID(product_code)
             # product.decrementQuantity(quantity)
-
             if prescription:
                 prescription.markComplete(product)
-
+            sale = {
+                "timestamp": datetime.now().isoformat(),
+                "customerID": customer_id,
+                "name": product.name,
+                "doctorName": prescription.DoctorName,
+                "salesperson": self.agentID,
+                "price": product.price,
+                "total_price": total_price,
+                "prescriptionID": prescription.get(self.prescriptions_file, prescription.PrescriptionID),
+                "cart_items": cart.products
+            }
+            self.sales.append(sale)
+            self.sales.append(sale)
         # Create a sale record
-        sale = {
-            "timestamp": datetime.now().isoformat(),
-            "customerID": customer_id,
-            "salesperson": self.agentID,
-            "total_price": total_price,
-            "cart_items": cart.products
-        }
-        self.sales.append(sale)
-
         # Clear the cart after successful checkout
         cart.clear()
 
         print("Checkout successful. Sale recorded.")
-        self.sales.append(sale)
-
         # Print the updated sales dictionary
         print("\nUpdated Sales Dictionary:")
         print(self.sales)
