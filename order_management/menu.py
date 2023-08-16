@@ -1,10 +1,11 @@
+import json
+
 from . import Stock, Cart, User, UserManagement, BookRecords, Wrapper, Prescription
 from .cart import Cart
+from .wrapper import Wrapper
 import os
 
 MSG_WRONG_INPUT = "Wrong input. Try again!"
-
-
 
 
 class Menu:
@@ -20,7 +21,8 @@ class Menu:
     """
 
     def __init__(self, stock: Stock, profiles: UserManagement, pharmacist: User, records_file: str,
-                 prescriptions_file: str, stock_file: str) -> None:
+                 prescriptions_file: str, stock_file: str, wrapper: Wrapper) -> None:
+        self.wrapper = wrapper
         self.stock = stock
         self.profiles = profiles
         self.pharmacist = pharmacist
@@ -143,14 +145,13 @@ class Menu:
         self.cart.remove_from_cart(product_code)
         self.run_order_management_menu()
 
-
     # TODO: Implement the logic to remove a product from the cart
-        #pass
+    # pass
 
     def clear_cart(self):
         """Clear the cart"""
         # TODO: Implement the logic to clear the cart
-        #pass
+        # pass
         self.cart.display_cart()
 
         if not self.cart.products:
@@ -169,10 +170,88 @@ class Menu:
         input("Press Enter to go back to the cart menu...")
         self.run_order_management_menu()
 
+    def display_prescription_data(self):
+        with open(self.prescriptions_file, 'r') as file:
+            prescriptions = json.load(file)
+
+            if not prescriptions:
+                print("No prescriptions found.")
+                return
+
+            print("Prescription Data:")
+            print("{:<15} {:<20} {:<25} {:<25} {:<40} {:<15}".format("Prescription ID", "Doctor Name", "Customer ID",
+                                                                     "Medication Name", "Medications", "Date"))
+            print("=" * 125)
+
+            for prescription in prescriptions:
+                doctor_name = prescription["DoctorName"]
+                prescription_id = prescription["PrescriptionID"]
+                customer_id = prescription["CustomerID"]
+                medications = prescription["Medications"]
+                date = prescription["Date"]
+
+                for med in medications:
+                    medication_id = med['id']
+                    medication_name = med['name']
+                    medication_quantity = med['quantity']
+
+                    print(
+                        "{:<15} {:<20} {:<25} {:<25} {:<40} {:<15}".format(prescription_id, doctor_name, customer_id,
+                                                                           medication_name,
+                                                                           f"{medication_quantity} {medication_id}",
+                                                                           date))
+
+            print("=" * 125)
+
+    # Call the function with the prescription file path
     def checkout(self):
         """Checkout the cart"""
-        # TODO: Implement the logic to checkout the cart
-        pass
+        if not self.cart.products:
+            print("Cart is empty. Nothing to checkout.")
+            return self.run_order_management_menu()
+
+        # Display products in the cart
+        print("Products in Cart:")
+        self.cart.display_cart()
+
+        # Display available products for reference
+        print("\nAvailable Products:")
+        print(self.display_prescription_data())
+
+        customer_id = input("Enter customer ID: ")
+        prescription_id = input("Enter prescription ID (if applicable, else press Enter): ")
+
+        if prescription_id:
+            prescription_data = Prescription.get(self.prescriptions_file, prescription_id)
+            if not prescription_data:
+                print("Prescription not found.")
+                return
+
+            prescription = Prescription(
+                DoctorName=prescription_data["DoctorName"],
+                PrescriptionID=prescription_data["PrescriptionID"],
+                Medications=prescription_data["Medications"],
+                CustomerID=prescription_data["CustomerID"],
+                Date=prescription_data["Date"]
+            )
+
+            # Verify if products in cart are in prescription and match required quantities
+            for product_code, quantity in self.cart.products.items():
+                product = self.stock.getProductByID(product_code)
+                if not prescription.medecineInPrescription(product, quantity):
+                    print(
+                        f"Product {product.name} with code {product.code} and quantity {quantity} not found in "
+                        f"prescription or quantity does not match.")
+                    return
+            self.wrapper.checkout(self.cart, customer_id, prescription)
+
+        # Display the sales
+        # print("\nSales:")
+        # for sale in self.wrap.sales:
+        #     print(sale)
+
+        # Clear the cart after successful checkout
+        self.cart.clear()
 
     def total_income(self):
         """Calculate the total income from purchases"""

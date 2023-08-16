@@ -31,9 +31,15 @@ class Prescription:
         Returns: A boolean denoting whether the value was found
         """
         #TODO: Implement the function
-        # 
-        return NotImplemented
-        
+        #
+        for medication in self.Medications:
+            if (
+                    medication["id"] == product.code
+                    and medication["quantity"] >= quantity
+            ):
+                return True
+        return False
+
     def markComplete(self, product: Product):
         """Mark a product's sale complete in the prescriptions file
 
@@ -44,7 +50,11 @@ class Prescription:
         """
         #TODO: Change the value "ProcessedStatus" of the relevant product to True
 
-        return NotImplemented
+        for medication in self.Medications:
+            if medication["id"] == product.code:
+                medication["ProcessedStatus"] = True
+                break
+
 
     def dump(self, outfile: str):
         """Dumps the updated prescription to the specified file
@@ -70,5 +80,16 @@ class Prescription:
 
         Returns: A prescription object as a dictionary
         """
+        try:
+            with open(infile, 'r') as file:
+                prescriptions = json.load(file)
+        except FileNotFoundError:
+            prescriptions = []
+
+        for prescription in prescriptions:
+            if prescription["PrescriptionID"] == id:
+                return prescription
+
+        return None
         #TODO: Load the file and find the object with the relevant ID
         #TODO: Return the relevant prescription

@@ -104,7 +104,7 @@ if __name__ == '__main__':
     cart = Cart(stock=stock)
     wrap = Wrapper(stock, logged_in_user.username)
     books = BookRecords.load(sales_file)
-    menu = Menu(stock, profiles, logged_in_user, sales_file, prescription_file, stock_file)
+    menu = Menu(stock, profiles, logged_in_user, sales_file, prescription_file, stock_file, wrapper=wrap)
 
     # Show the appropriate menu based on user's role
     if logged_in_user.role == 'salesperson':
