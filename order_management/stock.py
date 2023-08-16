@@ -35,7 +35,7 @@ class Stock:
         else:
             print("Quantity cannot be negative.")
 
-    def getProductByID(self, code: str) -> Product | None:
+    def getProductByID(self, code: str) -> Product:
         """Gets a product by its ID
 
         Args:
